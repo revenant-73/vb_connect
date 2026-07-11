@@ -15,7 +15,7 @@ export const auth = betterAuth({
     }),
     baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
     trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:3000"],
-    onRequest: async (request) => {
+    onRequest: async (request: Request) => {
         console.log(`Auth Request: ${request.method} ${request.url}`);
     },
     emailAndPassword: {
