@@ -27,7 +27,7 @@ export default function NewEventPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<EventFormValues>({
-    resolver: zodResolver(eventSchema),
+    resolver: zodResolver(eventSchema) as any,
     defaultValues: {
       visibility: "public",
       isWeatherDependent: true,
