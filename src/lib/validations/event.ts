@@ -4,7 +4,7 @@ export const eventSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().optional(),
   eventDate: z.coerce.date({
-    required_error: "Please select a date",
+    message: "Please select a date",
   }).refine((date) => !isNaN(date.getTime()), "Invalid date"),
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format").optional().or(z.literal("")),
