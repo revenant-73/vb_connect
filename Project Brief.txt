@@ -1,0 +1,742 @@
+# Hillsboro Grass Volleyball PWA
+
+## Project Brief
+
+### Project Goal
+
+Build a lightweight Progressive Web App for organizing casual grass volleyball gatherings in and around Hillsboro, Oregon.
+
+The app should replace the practical functions currently handled through Facebook without attempting to become another social media platform.
+
+The central questions the app must answer are:
+
+* When are people playing?
+* Where are they playing?
+* Who is planning to attend?
+* Has anything changed?
+* What does the group need to know?
+
+The experience should feel simple, local, welcoming, and easy to use for people who may not be especially comfortable with technology.
+
+---
+
+# Core Product Principles
+
+1. **Events come first.**
+   The home screen should prioritize upcoming volleyball gatherings.
+
+2. **Low friction.**
+   Members should be able to join, RSVP, and check event details with minimal effort.
+
+3. **No unnecessary social-media features.**
+   Do not add feeds, likes, followers, algorithms, or direct messaging.
+
+4. **Mobile-first.**
+   Most users will access the app from their phone.
+
+5. **Installable but not installation-dependent.**
+   The app should work well in a browser and also be installable as a PWA.
+
+6. **Organizer control without overmanagement.**
+   Organizers need enough control to prevent spam and confusion, but normal members should still be able to contribute.
+
+---
+
+# Initial Technology Stack
+
+Use the following stack unless a strong technical reason requires a change:
+
+* **Framework:** Next.js with TypeScript
+* **UI:** Tailwind CSS
+* **Database:** Turso
+* **ORM:** Drizzle ORM
+* **Authentication:** Better Auth
+* **Hosting:** Vercel
+* **PWA support:** Web app manifest and service worker
+* **Validation:** Zod
+* **Forms:** React Hook Form
+* **Icons:** Lucide
+* **Dates:** date-fns
+
+The app should be structured so that file storage and push notifications can be added later without requiring a major rewrite.
+
+---
+
+# User Roles
+
+## Visitor
+
+A visitor is not signed in.
+
+Visitors may:
+
+* View public upcoming events
+* View basic event details
+* See the date, time, location, format, and attendance count
+* Request access or sign in
+
+Visitors may not:
+
+* RSVP
+* Post messages
+* Create events
+* View private member details
+
+## Member
+
+A signed-in approved member may:
+
+* View all active events
+* RSVP to events
+* Change or remove an RSVP
+* Post messages within an event
+* View the names of members attending
+* Create an event if member-created events are enabled
+* Edit or cancel events they created
+* Update basic profile information
+
+## Organizer
+
+An organizer may:
+
+* Create, edit, cancel, and delete any event
+* Approve or remove members
+* Promote members to organizer
+* Pin announcements
+* Remove inappropriate event messages
+* Control whether members may create events
+* Manage group settings
+* Generate or disable invitation links
+
+---
+
+# Authentication and Membership
+
+Use passwordless authentication wherever practical.
+
+Preferred options:
+
+* Email magic link
+* Email verification code
+
+Avoid requiring users to remember a password.
+
+A newly authenticated user should not automatically gain full membership unless they joined through a valid invitation link or were approved by an organizer.
+
+Suggested membership statuses:
+
+* `pending`
+* `active`
+* `suspended`
+
+Suggested roles:
+
+* `member`
+* `organizer`
+
+---
+
+# Core Features
+
+## 1. Home Screen
+
+The home screen should show:
+
+* Group name
+* Next upcoming event
+* List of upcoming events
+* Important announcement, if one is active
+* Simple button to create an event for authorized users
+
+Each event card should include:
+
+* Event title
+* Date
+* Start and end time
+* Location
+* Number going
+* Number maybe attending
+* User’s current RSVP status
+* Cancelled or updated status where relevant
+
+Past events should not appear in the main upcoming list.
+
+---
+
+## 2. Event Creation
+
+Authorized users should be able to create an event with:
+
+* Event title
+* Date
+* Start time
+* Optional end time
+* Location name
+* Street address or park location
+* Optional map link
+* Event description
+* Volleyball format
+* Skill or experience guidance
+* Maximum attendance, optional
+* Visibility
+* Weather-dependent toggle
+* Organizer notes
+
+Suggested volleyball format options:
+
+* Open play
+* Doubles
+* Triples
+* Quads
+* Sixes
+* King or Queen of the Court
+* Tournament
+* Other
+
+Suggested experience options:
+
+* Everyone welcome
+* Beginner-friendly
+* Intermediate
+* Advanced
+* Mixed level
+
+The event creator should be automatically marked as attending unless they choose otherwise.
+
+---
+
+## 3. Event Details
+
+Each event page should display:
+
+* Full date and time
+* Location
+* Map link
+* Description
+* Format
+* Experience guidance
+* Attendance limit
+* Weather-dependent status
+* Event creator
+* RSVP controls
+* Attendance list
+* Event messages
+* Important updates
+
+The RSVP control should include:
+
+* Going
+* Maybe
+* Not going
+
+The user should be able to change their RSVP at any time.
+
+If an attendance limit is reached, additional members may be placed on a waitlist.
+
+---
+
+## 4. Event Messages
+
+Messages should be attached to individual events rather than existing as a global social feed.
+
+Members may use event messages for information such as:
+
+* Running late
+* Bringing a net
+* Weather concerns
+* Court availability
+* Need another player
+* Location clarification
+
+Messages should display:
+
+* Author
+* Timestamp
+* Message
+* Edited indicator, when applicable
+
+Organizers should be able to delete messages.
+
+Do not build live chat for the first version. Standard page refresh, revalidation, or periodic polling is sufficient.
+
+---
+
+## 5. Announcements
+
+Organizers should be able to publish a group announcement.
+
+Announcements may include:
+
+* Schedule changes
+* Seasonal updates
+* Group expectations
+* Weather information
+* Special tournaments
+
+An announcement should include:
+
+* Title
+* Body
+* Publish date
+* Optional expiration date
+* Pinned status
+
+Only one announcement needs to be prominently featured on the home screen at a time.
+
+---
+
+## 6. Member Directory
+
+Create a minimal member directory.
+
+Profiles should include:
+
+* Display name
+* Optional profile image
+* Optional short volleyball description
+* Preferred playing level
+* Organizer badge
+
+Do not include:
+
+* Personal social feed
+* Follower counts
+* Public email addresses
+* Public phone numbers
+* Direct messaging
+
+---
+
+## 7. Notifications
+
+For the first release, support in-app notification records.
+
+Notification types may include:
+
+* New event created
+* Event updated
+* Event cancelled
+* New message on an event the user is attending
+* RSVP waitlist promotion
+* New announcement
+
+Structure the notification system so email and web push notifications can be added later.
+
+Do not make push notifications a requirement for the initial release.
+
+---
+
+# Suggested Database Schema
+
+Use Drizzle migrations and typed schema definitions.
+
+## `users`
+
+Suggested fields:
+
+* `id`
+* `email`
+* `display_name`
+* `image_url`
+* `bio`
+* `preferred_level`
+* `created_at`
+* `updated_at`
+
+## `memberships`
+
+Suggested fields:
+
+* `id`
+* `user_id`
+* `role`
+* `status`
+* `joined_at`
+* `approved_by`
+* `created_at`
+* `updated_at`
+
+Even though the first version may support only one group, use a structure that could later support multiple groups without a full redesign.
+
+Consider including:
+
+* `group_id`
+
+## `groups`
+
+Suggested fields:
+
+* `id`
+* `name`
+* `slug`
+* `description`
+* `location`
+* `allow_member_events`
+* `created_at`
+* `updated_at`
+
+Initial group:
+
+* Hillsboro Grass Volleyball
+
+## `events`
+
+Suggested fields:
+
+* `id`
+* `group_id`
+* `created_by`
+* `title`
+* `description`
+* `event_date`
+* `start_time`
+* `end_time`
+* `location_name`
+* `address`
+* `map_url`
+* `format`
+* `experience_level`
+* `max_attendees`
+* `visibility`
+* `weather_dependent`
+* `status`
+* `created_at`
+* `updated_at`
+
+Suggested event statuses:
+
+* `scheduled`
+* `cancelled`
+* `completed`
+
+## `rsvps`
+
+Suggested fields:
+
+* `id`
+* `event_id`
+* `user_id`
+* `status`
+* `created_at`
+* `updated_at`
+
+Suggested RSVP statuses:
+
+* `going`
+* `maybe`
+* `not_going`
+* `waitlisted`
+
+Add a unique constraint for:
+
+* `event_id`
+* `user_id`
+
+## `event_messages`
+
+Suggested fields:
+
+* `id`
+* `event_id`
+* `user_id`
+* `body`
+* `created_at`
+* `updated_at`
+* `deleted_at`
+
+## `announcements`
+
+Suggested fields:
+
+* `id`
+* `group_id`
+* `created_by`
+* `title`
+* `body`
+* `is_pinned`
+* `published_at`
+* `expires_at`
+* `created_at`
+* `updated_at`
+
+## `notifications`
+
+Suggested fields:
+
+* `id`
+* `user_id`
+* `type`
+* `title`
+* `body`
+* `link`
+* `read_at`
+* `created_at`
+
+## `invitations`
+
+Suggested fields:
+
+* `id`
+* `group_id`
+* `token`
+* `created_by`
+* `expires_at`
+* `max_uses`
+* `use_count`
+* `disabled_at`
+* `created_at`
+
+---
+
+# Main Routes
+
+Suggested application routes:
+
+* `/`
+* `/events`
+* `/events/[eventId]`
+* `/events/new`
+* `/events/[eventId]/edit`
+* `/members`
+* `/notifications`
+* `/profile`
+* `/settings`
+* `/admin`
+* `/invite/[token]`
+* `/sign-in`
+
+Use protected routing for member and organizer areas.
+
+---
+
+# Design Direction
+
+The visual design should be:
+
+* Clean
+* Friendly
+* Outdoors-oriented
+* Mobile-first
+* Minimal
+* Easy to scan in sunlight
+* Clear enough for users of different ages
+
+Avoid a visual style that feels like Facebook, Discord, or a corporate scheduling platform.
+
+Suggested visual tone:
+
+* White or warm off-white background
+* Dark charcoal text
+* Natural green accent
+* Optional grass or sand-inspired secondary accent
+* Large touch targets
+* Rounded cards
+* Limited visual clutter
+
+Accessibility requirements:
+
+* Strong color contrast
+* Visible focus states
+* Keyboard navigation
+* Form labels
+* Accessible error messages
+* No critical information conveyed only through color
+* Minimum practical mobile touch target size
+
+---
+
+# PWA Requirements
+
+The app should:
+
+* Be installable from supported browsers
+* Include a web app manifest
+* Include appropriate icons
+* Use a service worker
+* Provide a basic offline fallback
+* Cache the app shell
+* Allow previously loaded event details to remain readable offline where practical
+
+Do not allow offline creation or editing of events in the first version.
+
+The app should clearly communicate when the user is offline.
+
+---
+
+# Security and Permissions
+
+Implement authorization on the server, not only in the interface.
+
+Requirements:
+
+* Visitors cannot access private membership data
+* Members cannot edit another member’s event unless they are organizers
+* Members cannot change their own role
+* Only organizers can approve, suspend, or remove members
+* Invitation tokens must be unguessable
+* Input must be validated on both client and server
+* Event messages must be escaped or sanitized
+* Rate-limit sensitive actions where practical
+
+Do not rely on hidden buttons as a security measure.
+
+---
+
+# Initial MVP Scope
+
+The first usable release should include:
+
+1. Authentication
+2. Invitation-based membership
+3. Upcoming event list
+4. Event creation and editing
+5. Event details
+6. RSVP system
+7. Attendance lists
+8. Event messages
+9. Organizer permissions
+10. Basic announcements
+11. Installable PWA
+12. Responsive mobile interface
+
+---
+
+# Features to Delay
+
+Do not build these in the first release:
+
+* Direct messages
+* Global chat
+* Social media feed
+* Likes or reactions
+* Followers
+* Photo galleries
+* Payment processing
+* Tournament brackets
+* Team formation tools
+* Advanced player ratings
+* Native iOS or Android apps
+* Complex real-time messaging
+* AI features
+* Multiple independent communities
+
+The architecture may leave room for future expansion, but these features should not complicate the MVP.
+
+---
+
+# Future Features
+
+Possible later additions:
+
+* Weather forecast integration
+* Weather cancellation alerts
+* Push notifications
+* Email notifications
+* Recurring events
+* Calendar export
+* Google Maps integration
+* Equipment checklist
+* Net and ball availability
+* Player waitlist
+* Multiple volleyball groups
+* Private organizer notes
+* Seasonal event archive
+* Event photos
+* Polls for dates or locations
+
+---
+
+# Development Standards
+
+* Use strict TypeScript
+* Avoid `any`
+* Keep components small and purposeful
+* Separate database access from presentation code
+* Use server-side authorization
+* Use reusable form components
+* Use clear loading, empty, success, and error states
+* Include meaningful error handling
+* Use environment variables for secrets
+* Include setup documentation
+* Include seed data for local development
+* Keep the schema migration process documented
+
+---
+
+# Testing Priorities
+
+At minimum, test:
+
+* Sign-in flow
+* Invitation acceptance
+* Member approval
+* Event creation
+* Event editing permissions
+* RSVP creation and updates
+* Attendance limit behavior
+* Event cancellation
+* Event message permissions
+* Organizer-only actions
+
+Prioritize authorization and data integrity over cosmetic testing.
+
+---
+
+# Seed Data
+
+Create sample development data including:
+
+* One organizer
+* Four members
+* One pending member
+* Three upcoming events
+* One cancelled event
+* Multiple RSVP states
+* Several event messages
+* One pinned announcement
+
+Use realistic Hillsboro-area park names only as clearly marked sample data.
+
+---
+
+# Deliverables
+
+The initial project should include:
+
+* Working Next.js application
+* Turso and Drizzle configuration
+* Database schema
+* Migration files
+* Authentication setup
+* Responsive interface
+* PWA configuration
+* Seed script
+* `.env.example`
+* README with installation and deployment instructions
+* Clear list of unfinished or deferred features
+
+---
+
+# Definition of Done
+
+The MVP is complete when an invited user can:
+
+1. Open the app from an invitation link
+2. Authenticate
+3. Join the group
+4. View upcoming events
+5. Open an event
+6. RSVP
+7. See who else is attending
+8. Post an event message
+9. Return later and update their RSVP
+
+An organizer must also be able to:
+
+1. Create an event
+2. Edit or cancel an event
+3. Publish an announcement
+4. Approve or remove a member
+5. Moderate event messages
+
+The app should work cleanly on both desktop and mobile, but mobile usability should take priority.
