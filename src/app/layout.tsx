@@ -22,6 +22,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "VB Connect",
   },
+  icons: {
+    apple: "/vbconnect_logo.png",
+  },
 };
 
 export const viewport: Viewport = {

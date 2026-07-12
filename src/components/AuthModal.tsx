@@ -78,6 +78,9 @@ export function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white dark:bg-gray-900 rounded-[3rem] shadow-2xl z-[101] overflow-hidden border border-gray-100 dark:border-white/5"
           >
             <div className="p-8 md:p-12 space-y-8">
+              <div className="flex justify-center">
+                <img src="/vbconnect_logo.png" alt="VB Connect" className="h-12 w-auto" />
+              </div>
               <div className="flex justify-between items-start">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">

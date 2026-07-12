@@ -34,8 +34,7 @@ export function Navbar() {
         <div className="max-w-md mx-auto px-6 md:max-w-4xl">
           <div className="flex justify-between items-center h-16 md:h-20">
             <Link href="/" className="hidden md:flex items-center space-x-2 font-black text-2xl text-indigo-600 dark:text-indigo-500 tracking-tighter">
-              <span className="bg-indigo-600 dark:bg-indigo-500 text-white px-2 py-0.5 rounded-lg">V</span>
-              <span>BC</span>
+              <img src="/vbconnect_logo.png" alt="VB Connect" className="h-8 w-auto" />
             </Link>
             
             <div className="flex justify-around w-full md:w-auto md:space-x-10">

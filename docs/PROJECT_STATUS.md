@@ -1,31 +1,34 @@
-# Technical Project Status - July 10, 2026
+# Technical Project Status - July 12, 2026
 
 ## 🛠️ Current Implementation State
 
-### Authentication
-- **Status:** Fully functional but **Development Mode only**.
-- **Details:** Better Auth is configured with the `magicLink` plugin. Currently, magic links are logged to the console (`stdout`) instead of being sent via email.
-- **Action Required:** Integrate an email provider (Resend, Postmark, etc.) in `.\src\lib\auth.ts`.
+### Authentication & Branding
+- **Status:** Fully functional with updated branding.
+- **Details:** Better Auth is configured with Magic Links. The app has been renamed to **Volleyball Connect**, and custom branding (`vbconnect_logo.png`) is integrated into the Navbar, Auth Modals, and PWA icons.
 
-### Database
-- **Status:** SQLite (Local/Turso).
-- **Details:** Schema is up-to-date with the Project Brief. Migrations/Push should be run after any schema changes.
-- **Current Tables:** `user`, `session`, `account`, `verification`, `groups`, `memberships`, `events`, `rsvps`, `event_messages`, `announcements`, `notifications`.
+### Maps & Location
+- **Status:** Integrated and functional.
+- **Details:** Google Maps Platform is used for **Location Selection** (via Autocomplete) and **Map Previews** on event pages. Coordinates (Lat/Lng) are stored in the database for accuracy.
+
+### Database & Admin
+- **Status:** SQLite (Turso) with Moderation UI.
+- **Details:** Admin dashboard is live at `/admin/members` and `/admin/requests`. Admins can approve/reject user suggestions for new metro areas and zones.
 
 ### Core Features
-- **Events:** Creation and viewing are implemented.
-- **RSVPs:** Server actions handle status updates. Real-time updates are simulated via page revalidation.
-- **Huddle:** Message board is functional, supporting basic posting and display of member info.
-- **UI:** Custom design using Tailwind CSS with a "Mobile-First" approach. `AnimatedEventCard` uses Framer Motion for a premium feel.
+- **Events:** Creation now includes smart location lookup. Viewing an event shows a map if coordinates are available.
+- **RSVPs:** Fully functional with real-time (revalidation) updates.
+- **Huddle:** Functional message board for event coordination.
 
 ### PWA
-- **Status:** Manifest exists; Service Worker needs final configuration for offline caching.
+- **Status:** Manifest and metadata are updated with new branding. Apple touch icons are configured.
 
 ## 🔑 Key Files to Review
-- `.\src\db\schema.ts`: The source of truth for the data model.
-- `.\src\lib\auth.ts`: Auth configuration and magic link logic.
-- `.\src\lib\actions\event.ts`: Server actions for creating/modifying events.
-- `.\src\app\page.tsx`: Main entry point for the user experience.
+- `.\src\db\schema.ts`: Source of truth for the data model (including new location fields).
+- `.\src\app\events\new\page.tsx`: Implementation of the new Map-integrated event creation form.
+- `.\src\app\admin\requests\page.tsx`: Location request moderation interface.
+- `.\public\manifest.json`: PWA configuration.
 
-## 🚀 Tomorrow's Starting Point
-The easiest place to pick back up is **Profile Management** or **Member Approval**. The schema supports `isApproved`, but there is currently no UI for an organizer to approve a pending member.
+## 🚀 Future Roadmap
+- **Email Delivery:** Transition from console-logging magic links to Resend API.
+- **Push Notifications:** Web Push for new events in a user's metro area.
+- **Member Profiles:** Expanded public profiles with volleyball stats.
