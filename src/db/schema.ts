@@ -13,6 +13,7 @@ export const user = sqliteTable("user", {
   // Custom profile fields
   bio: text("bio"),
   preferredLevel: text("preferred_level"), // beginner, intermediate, advanced, etc.
+  homeMetro: text("home_metro").notNull().default("Portland, OR"),
   isApproved: integer("is_approved", { mode: "boolean" }).notNull().default(true),
   role: text("role", { enum: ["user", "admin"] }).notNull().default("user"),
 });
@@ -99,8 +100,12 @@ export const events = sqliteTable("events", {
   startTime: text("start_time").notNull(), // HH:mm
   endTime: text("end_time"), // HH:mm
   locationName: text("location_name").notNull(),
+  metro: text("metro").notNull().default("Portland, OR"),
+  activityZone: text("activity_zone").notNull(),
   address: text("address"),
   mapUrl: text("map_url"),
+  latitude: text("latitude"),
+  longitude: text("longitude"),
   format: text("format").notNull(), // open play, doubles, etc.
   experienceLevel: text("experience_level").notNull(), // beginner, intermediate, etc.
   maxAttendees: integer("max_attendees"),
@@ -176,6 +181,18 @@ export const notifications = sqliteTable("notifications", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(strftime('%s', 'now'))`),
 });
 
+export const locationRequests = sqliteTable("location_requests", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id),
+  type: text("type", { enum: ["metro", "zone"] }).notNull(),
+  suggestion: text("suggestion").notNull(),
+  context: text("context"), // e.g., which metro the zone is for
+  status: text("status", { enum: ["pending", "approved", "rejected"] }).notNull().default("pending"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(strftime('%s', 'now'))`),
+});
+
 // Define relations
 export const userRelations = relations(user, ({ many }) => ({
   memberships: many(memberships),
@@ -184,6 +201,14 @@ export const userRelations = relations(user, ({ many }) => ({
   eventMessages: many(eventMessages),
   announcements: many(announcements),
   notifications: many(notifications),
+  locationRequests: many(locationRequests),
+}));
+
+export const locationRequestsRelations = relations(locationRequests, ({ one }) => ({
+  user: one(user, {
+    fields: [locationRequests.userId],
+    references: [user.id],
+  }),
 }));
 
 export const groupsRelations = relations(groups, ({ many }) => ({

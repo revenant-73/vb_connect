@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, User, MessageSquare, Shield, LogOut, Loader2, CheckCircle2 } from "lucide-react";
@@ -17,18 +17,19 @@ export default function SettingsPage() {
   const [name, setName] = useState(session?.user?.name || "");
   const [bio, setBio] = useState((session?.user as any)?.bio || "");
   const [preferredLevel, setPreferredLevel] = useState((session?.user as any)?.preferredLevel || "intermediate");
+  
+  useEffect(() => {
+    if (!isSessionLoading && !session) {
+      router.push("/");
+    }
+  }, [session, isSessionLoading, router]);
 
-  if (isSessionLoading) {
+  if (isSessionLoading || !session) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
       </div>
     );
-  }
-
-  if (!session) {
-    router.push("/");
-    return null;
   }
 
   const handleUpdateProfile = async (e: React.FormEvent) => {

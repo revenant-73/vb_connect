@@ -1,6 +1,6 @@
 # Project Roadmap & TODOs
 
-This document tracks the current progress and remaining tasks for the Hillsboro Grass Volleyball PWA.
+This document tracks the current progress and remaining tasks for the Volleyball Connect PWA.
 
 ## ✅ Completed
 - [x] Initial project setup (Next.js, Tailwind, TypeScript)
@@ -11,6 +11,7 @@ This document tracks the current progress and remaining tasks for the Hillsboro 
 - [x] "Huddle" event message system
 - [x] Event creation form
 - [x] RSVP Action system (Going/Maybe/Not Going)
+- [x] Map Integration (Google Places Autocomplete & Map Preview)
 
 ## 🚧 In Progress / Next Up
 - [ ] **Email Integration:** Connect Better Auth to an email provider (e.g., Resend) for real magic link delivery.

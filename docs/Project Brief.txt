@@ -1,10 +1,10 @@
-# Hillsboro Grass Volleyball PWA
+# Volleyball Connect PWA
 
 ## Project Brief
 
 ### Project Goal
 
-Build a lightweight Progressive Web App for organizing casual grass volleyball gatherings in and around Hillsboro, Oregon.
+Build a lightweight Progressive Web App for organizing casual volleyball gatherings in your metro area.
 
 The app should replace the practical functions currently handled through Facebook without attempting to become another social media platform.
 
@@ -377,7 +377,7 @@ Suggested fields:
 
 Initial group:
 
-* Hillsboro Grass Volleyball
+* Volleyball Connect
 
 ## `events`
 
@@ -695,7 +695,7 @@ Create sample development data including:
 * Several event messages
 * One pinned announcement
 
-Use realistic Hillsboro-area park names only as clearly marked sample data.
+Use realistic sample data for parks and locations only as clearly marked sample data.
 
 ---
 

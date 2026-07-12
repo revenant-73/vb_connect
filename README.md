@@ -1,10 +1,10 @@
-# Hillsboro Grass Volleyball PWA
+# Volleyball Connect PWA
 
-A lightweight Progressive Web App for organizing casual grass volleyball gatherings in and around Hillsboro, Oregon.
+A lightweight Progressive Web App for organizing casual volleyball gatherings in any metro area.
 
 ## 🚀 Overview
 
-This app replaces the practical functions of Facebook groups for local volleyball organizers. It prioritizes upcoming events, low-friction RSVPs, and essential group communication without the noise of social media feeds.
+This app replaces the practical functions of Facebook groups for local volleyball organizers. It prioritizes upcoming events, low-friction RSVPs, and essential group communication across multiple metro areas without the noise of social media feeds.
 
 ## 🛠️ Tech Stack
 

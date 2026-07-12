@@ -2,19 +2,25 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { eventSchema, type EventFormValues } from "@/lib/validations/event";
+import { eventSchema, type EventFormValues, METRO_ZONES, METRO_OPTIONS } from "@/lib/validations/event";
 import { createEvent } from "@/lib/actions/event";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition, useEffect } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useAuthModal } from "@/context/AuthModalContext";
+import { RequestAreaModal } from "@/components/RequestAreaModal";
+import { LocationPicker } from "@/components/LocationPicker";
 
 export default function NewEventPage() {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const { openAuthModal } = useAuthModal();
   const { data: session, isPending: isSessionLoading } = authClient.useSession();
+  const [requestModal, setRequestModal] = useState<{ open: boolean; type: "metro" | "zone" }>({
+    open: false,
+    type: "metro"
+  });
 
   useEffect(() => {
     if (!isSessionLoading && !session) {
@@ -25,6 +31,8 @@ export default function NewEventPage() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema) as any,
@@ -33,8 +41,21 @@ export default function NewEventPage() {
       isWeatherDependent: true,
       format: "Open Play",
       experienceLevel: "Everyone Welcome",
+      metro: METRO_OPTIONS[0],
+      activityZone: Object.values(METRO_ZONES[METRO_OPTIONS[0]])[0][0],
     },
   });
+
+  const selectedMetro = watch("metro");
+
+  // Reset activity zone when metro changes
+  useEffect(() => {
+    const zonesForMetro = METRO_ZONES[selectedMetro as keyof typeof METRO_ZONES];
+    if (zonesForMetro) {
+      const firstZone = Object.values(zonesForMetro)[0][0];
+      setValue("activityZone", firstZone);
+    }
+  }, [selectedMetro, setValue]);
 
   const onSubmit = async (data: EventFormValues) => {
     setError(null);
@@ -139,6 +160,87 @@ export default function NewEventPage() {
 
         {/* Location */}
         <div className="space-y-6">
+          <div className="space-y-3">
+            <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1">Metro Area</label>
+            <div className="relative">
+              <select
+                {...register("metro")}
+                className="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-white/10 focus:border-indigo-600 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 outline-none transition-all text-gray-900 dark:text-white font-bold appearance-none cursor-pointer"
+              >
+                {METRO_OPTIONS.map((metro) => (
+                  <option key={metro} value={metro} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                    {metro}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <ChevronLeft className="h-4 w-4 rotate-270" />
+              </div>
+            </div>
+            {errors.metro && <p className="text-red-500 text-[10px] font-black uppercase tracking-wider ml-1">{errors.metro.message}</p>}
+            <button
+              type="button"
+              onClick={() => setRequestModal({ open: true, type: "metro" })}
+              className="flex items-center gap-2 text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline ml-1 pt-1"
+            >
+              <PlusCircle className="h-3 w-3" />
+              Request new area...
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1">Activity Zone</label>
+            <div className="relative">
+              <select
+                {...register("activityZone")}
+                className="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border-2 border-gray-100 dark:border-white/10 focus:border-indigo-600 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-gray-900 outline-none transition-all text-gray-900 dark:text-white font-bold appearance-none cursor-pointer"
+              >
+                {Object.entries(METRO_ZONES[selectedMetro as keyof typeof METRO_ZONES] || {}).map(([group, zones]) => (
+                  <optgroup key={group} label={group} className="bg-white dark:bg-gray-800 text-gray-400 font-black uppercase text-[10px] tracking-widest">
+                    {(zones as readonly string[]).map((zone) => (
+                      <option key={zone} value={zone} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold normal-case text-base">
+                        {zone}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <ChevronLeft className="h-4 w-4 rotate-270" />
+              </div>
+            </div>
+            {errors.activityZone && <p className="text-red-500 text-[10px] font-black uppercase tracking-wider ml-1">{errors.activityZone.message}</p>}
+            <button
+              type="button"
+              onClick={() => setRequestModal({ open: true, type: "zone" })}
+              className="flex items-center gap-2 text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline ml-1 pt-1"
+            >
+              <PlusCircle className="h-3 w-3" />
+              Request new zone in {selectedMetro}...
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 px-2">
+              <h2 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] whitespace-nowrap">Map Integration</h2>
+              <div className="h-px bg-gray-100 dark:bg-white/10 w-full" />
+            </div>
+            
+            <div className="space-y-3">
+              <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1">Search & Pin Location</label>
+              <LocationPicker 
+                onLocationSelect={(loc) => {
+                  setValue("locationName", loc.name);
+                  setValue("address", loc.address);
+                  setValue("mapUrl", loc.url);
+                  setValue("latitude", loc.lat.toString());
+                  setValue("longitude", loc.lng.toString());
+                }} 
+              />
+              <p className="text-[10px] text-gray-400 font-bold ml-1 italic">* Selecting a location will auto-fill the fields below</p>
+            </div>
+          </div>
+
           <div className="space-y-3">
             <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1">Location Name</label>
             <input
@@ -261,6 +363,13 @@ export default function NewEventPage() {
           )}
         </button>
       </form>
+
+      <RequestAreaModal 
+        isOpen={requestModal.open}
+        onClose={() => setRequestModal({ ...requestModal, open: false })}
+        defaultType={requestModal.type}
+        context={selectedMetro}
+      />
     </div>
   );
 }

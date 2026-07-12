@@ -51,7 +51,7 @@ export function AnimatedEventCard({ event, isFeatured = false, index = 0 }: Even
               </div>
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 text-indigo-700 dark:text-indigo-400" />
-                <span className="truncate">{event.locationName}</span>
+                <span className="truncate">{event.locationName}{event.activityZone ? ` (${event.activityZone})` : ""}</span>
               </div>
             </div>
           </div>

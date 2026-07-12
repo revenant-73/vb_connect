@@ -10,10 +10,12 @@ import {
   CloudRain,
   Share2,
   Users,
-  Info
+  Info,
+  MessageSquare
 } from "lucide-react";
 import { RSVPButtons } from "@/components/RSVPButtons";
 import { EventMessages } from "@/components/EventMessages";
+import { MapPreview } from "@/components/MapPreview";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -120,7 +122,7 @@ export default async function EventDetailsPage({ params }: { params: Promise<{ i
               </p>
               <div className="flex items-center gap-2 mt-1">
                 <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.15em] truncate">
-                  {event.address || "Hillsboro, OR"}
+                  {event.metro}, OR • {event.activityZone} {event.address ? `• ${event.address}` : ""}
                 </p>
                 {event.mapUrl && (
                   <a 
@@ -147,6 +149,17 @@ export default async function EventDetailsPage({ params }: { params: Promise<{ i
 
       {/* Interactive Content Tabs/Sections */}
       <div className="space-y-12 pt-4 px-1">
+        
+        {/* Map Preview */}
+        {(event as any).latitude && (event as any).longitude && (
+          <section className="space-y-4">
+            <div className="flex items-center gap-2 px-2">
+              <MapPin className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+              <h2 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em]">Location</h2>
+            </div>
+            <MapPreview lat={(event as any).latitude} lng={(event as any).longitude} />
+          </section>
+        )}
         
         {/* About the Event */}
         <section className="space-y-4">
@@ -211,17 +224,29 @@ export default async function EventDetailsPage({ params }: { params: Promise<{ i
             <Share2 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
             <h2 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em]">Discussion</h2>
           </div>
-          <div className="min-h-[400px]">
-            <EventMessages 
-              eventId={event.id} 
-              messages={event.eventMessages.map(m => ({
-                ...m,
-                user: {
-                  ...m.user,
-                }
-              }))}
-              currentUserId={session?.user?.id}
-            />
+          <div className="min-h-[100px]">
+            {userRsvp && userRsvp.status !== 'not_going' ? (
+              <EventMessages 
+                eventId={event.id} 
+                messages={event.eventMessages.map(m => ({
+                  ...m,
+                  user: {
+                    ...m.user,
+                  }
+                }))}
+                currentUserId={session?.user?.id}
+              />
+            ) : (
+              <div className="bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 p-12 rounded-[2.5rem] text-center space-y-4">
+                <div className="bg-white dark:bg-white/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto text-gray-300 dark:text-gray-500 shadow-sm">
+                  <MessageSquare className="h-6 w-6" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-gray-900 dark:text-white font-black text-sm uppercase tracking-widest">Discussion Locked</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">You must RSVP &apos;Going&apos; or &apos;Maybe&apos; to view and participate in the discussion.</p>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

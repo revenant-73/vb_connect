@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { events, eventMessages, rsvps } from "@/db/schema";
-import { eq, desc, and, gte, sql } from "drizzle-orm";
+import { eq, desc, and, gte, sql, inArray, ne } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -14,13 +14,58 @@ export default async function MessagesPage() {
   });
 
   if (!session) {
-    redirect("/"); // Or show an empty state/auth prompt
+    redirect("/");
   }
 
-  // Fetch all events that have messages, or events the user is RSVP'd to
-  // For now, let's show events that have messages, ordered by the latest message
-  // We'll join with events to get the title
+  // 1. Get IDs of events the user is involved in (RSVP'd going or maybe)
+  const userRsvps = await db.query.rsvps.findMany({
+    where: and(
+      eq(rsvps.userId, session.user.id),
+      ne(rsvps.status, "not_going")
+    ),
+    columns: {
+      eventId: true,
+    }
+  });
+
+  const involvedEventIds = userRsvps.map(r => r.eventId);
+
+  if (involvedEventIds.length === 0) {
+    return (
+      <div className="space-y-10 py-8">
+        <section className="space-y-2">
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight">
+            Messages
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">
+            Discussion for upcoming and recent sessions.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <div className="bg-white/5 dark:bg-white/5 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-[2.5rem] p-12 text-center space-y-6 backdrop-blur-sm">
+            <div className="bg-white dark:bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-gray-300 dark:text-gray-400 shadow-sm">
+              <MessageSquare className="h-8 w-8" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-gray-900 dark:text-white font-black text-xl">No active chats</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">RSVP to an event to see its discussion!</p>
+            </div>
+            <Link 
+              href="/events" 
+              className="inline-block bg-white dark:bg-white dark:text-gray-900 px-8 py-3 rounded-2xl text-indigo-600 text-sm font-black hover:bg-indigo-50 dark:hover:bg-indigo-400 transition-all shadow-lg shadow-black/5"
+            >
+              Browse Events
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // 2. Fetch those events and their latest messages
   const activeChats = await db.query.events.findMany({
+    where: inArray(events.id, involvedEventIds),
     with: {
       eventMessages: {
         orderBy: [desc(eventMessages.createdAt)],
@@ -30,8 +75,6 @@ export default async function MessagesPage() {
         }
       },
     },
-    // Only show events that have at least one message or are upcoming
-    // This logic can be refined: e.g., only events the user is involved in
   });
 
   // Filter and sort by latest message

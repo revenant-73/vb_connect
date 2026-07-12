@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { MemberRow } from "@/components/admin/MemberRow";
-import { Users, ChevronLeft } from "lucide-react";
+import { Users, ChevronLeft, MapPin } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminMembersPage() {
@@ -36,8 +36,17 @@ export default async function AdminMembersPage() {
             <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Admin Controls</p>
           </div>
         </div>
-        <div className="bg-indigo-100 dark:bg-indigo-500/20 p-4 rounded-3xl text-indigo-700 dark:text-indigo-400">
-           <Users className="h-6 w-6" />
+        <div className="flex items-center gap-2">
+          <Link 
+            href="/admin/requests"
+            className="flex items-center gap-2 bg-amber-100 dark:bg-amber-500/20 px-4 py-2 rounded-2xl text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest hover:bg-amber-200 dark:hover:bg-amber-500/30 transition-colors"
+          >
+            <MapPin className="h-4 w-4" />
+            Location Requests
+          </Link>
+          <div className="bg-indigo-100 dark:bg-indigo-500/20 p-4 rounded-3xl text-indigo-700 dark:text-indigo-400">
+             <Users className="h-6 w-6" />
+          </div>
         </div>
       </header>
 

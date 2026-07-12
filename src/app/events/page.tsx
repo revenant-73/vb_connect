@@ -3,21 +3,46 @@ import Link from "next/link";
 import { startOfToday } from "date-fns";
 import { db } from "@/db";
 import { events } from "@/db/schema";
-import { gte, asc } from "drizzle-orm";
+import { gte, asc, and, inArray, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { AnimatedEventCard } from "@/components/AnimatedEventCard";
+import { ActivityZoneFilter } from "@/components/ActivityZoneFilter";
 
-export default async function EventsPage() {
+interface EventsPageProps {
+  searchParams: Promise<{ 
+    zone?: string | string[];
+    metro?: string;
+  }>;
+}
+
+export default async function EventsPage({ searchParams }: EventsPageProps) {
+  const { zone, metro } = await searchParams;
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   const today = startOfToday();
+  const currentMetro = metro || "Portland, OR";
+
+  // Build filter
+  const conditions = [
+    gte(events.eventDate, today),
+    eq(events.metro, currentMetro)
+  ];
+  
+  if (zone) {
+    const zoneFilters = Array.isArray(zone) ? zone : [zone];
+    const filteredZones = zoneFilters.filter(z => z !== "All");
+    
+    if (filteredZones.length > 0) {
+      conditions.push(inArray(events.activityZone, filteredZones));
+    }
+  }
 
   // Fetch all upcoming events
   const upcomingEventsData = await db.query.events.findMany({
-    where: gte(events.eventDate, today),
+    where: and(...conditions),
     orderBy: [asc(events.eventDate), asc(events.startTime)],
     with: {
       rsvps: true,
@@ -40,13 +65,17 @@ export default async function EventsPage() {
   return (
     <div className="space-y-10 py-8">
       {/* Header */}
-      <section className="space-y-2">
-        <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight">
-          Events
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 font-medium">
-          Discover and join upcoming volleyball sessions.
-        </p>
+      <section className="space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight">
+            Events
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">
+            Discover and join upcoming volleyball sessions in your area.
+          </p>
+        </div>
+        
+        <ActivityZoneFilter />
       </section>
 
       {/* Events List */}

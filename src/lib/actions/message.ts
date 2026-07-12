@@ -1,11 +1,12 @@
 "use server";
 
 import { db } from "@/db";
-import { eventMessages } from "@/db/schema";
+import { eventMessages, rsvps } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { nanoid } from "nanoid";
+import { and, eq, ne } from "drizzle-orm";
 
 export async function postMessage(eventId: string, content: string) {
   const session = await auth.api.getSession({
@@ -14,6 +15,19 @@ export async function postMessage(eventId: string, content: string) {
 
   if (!session?.user) {
     throw new Error("You must be signed in to post a message");
+  }
+
+  // Check if user is RSVP'd
+  const rsvp = await db.query.rsvps.findFirst({
+    where: and(
+      eq(rsvps.eventId, eventId),
+      eq(rsvps.userId, session.user.id),
+      ne(rsvps.status, "not_going")
+    )
+  });
+
+  if (!rsvp) {
+    throw new Error("You must RSVP 'Going' or 'Maybe' to participate in this discussion.");
   }
 
   if (!session.user.isApproved) {

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "VB Connect",
-  description: "Casual volleyball gatherings in Hillsboro, Oregon",
+  description: "Casual volleyball gatherings in your metro area",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

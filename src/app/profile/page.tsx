@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AnimatedEventCard } from "@/components/AnimatedEventCard";
-import { Settings, LogOut, Award, Calendar, Users, Shield } from "lucide-react";
+import { Settings, LogOut, Award, Calendar, Users, Shield, MapPin } from "lucide-react";
 import Link from "next/link";
 
 export default async function ProfilePage() {
@@ -107,13 +107,22 @@ export default async function ProfilePage() {
                 Edit Profile
               </Link>
               {userData.role === 'admin' && (
-                <Link 
-                  href="/admin/members"
-                  className="bg-indigo-600 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200 dark:shadow-none"
-                >
-                  <Shield className="h-4 w-4" />
-                  Manage Members
-                </Link>
+                <>
+                  <Link 
+                    href="/admin/members"
+                    className="bg-indigo-600 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200 dark:shadow-none"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Manage Members
+                  </Link>
+                  <Link 
+                    href="/admin/requests"
+                    className="bg-amber-500 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-amber-600 transition-colors flex items-center gap-2 shadow-lg shadow-amber-200 dark:shadow-none"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Manage Requests
+                  </Link>
+                </>
               )}
             </div>
           </div>
